@@ -1,0 +1,1221 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>장안 우미린 랜딩페이지</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Jua&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --header-height: 80px; /* Default estimate, will be updated by JS */
+        }
+        body {
+            font-family: 'Inter', sans-serif;
+            scroll-behavior: smooth; /* 앵커 링크에 대한 부드러운 스크롤 */
+            overflow-x: hidden; /* Prevent horizontal scroll */
+        }
+        /* 드롭다운 메뉴는 기본적으로 숨겨져 있으며, JS로 제어됩니다. */
+        .dropdown-menu {
+            display: none;
+            position: absolute; /* 절대 위치 지정 */
+            top: 100%; /* 상위 요소 바로 아래에 위치 */
+            left: 0;
+            z-index: 51; /* 메인 헤더 위에 오도록 */
+            width: 12rem; /* w-48 (192px) */
+            background-color: white;
+            border-radius: 0.5rem; /* rounded-md */
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05); /* shadow-lg */
+            padding-top: 0.5rem; /* 상위 메뉴와의 간격 */
+            padding-bottom: 0.5rem; /* 하위 메뉴와의 간격 */
+        }
+        /* 모바일 메뉴 토글을 위한 사용자 정의 스타일 */
+        .hamburger-menu span {
+            display: block;
+            width: 25px;
+            height: 3px;
+            background-color: #fff; /* 기본적으로 흰색으로 설정 */
+            margin: 5px 0;
+            transition: 0.4s;
+        }
+        .hamburger-menu.open span:nth-child(1) {
+            transform: rotate(-45deg) translate(-5px, 6px);
+            background-color: #333; /* 열릴 때 어두운 색으로 변경 */
+        }
+        .hamburger-menu.open span:nth-child(2) {
+            opacity: 0;
+        }
+        .hamburger-menu.open span:nth-child(3) {
+            transform: rotate(45deg) translate(-5px, -6px);
+            background-color: #333; /* 열릴 때 어두운 색으로 변경 */
+        }
+        /* 헤더 호버 시 햄버거 메뉴 아이콘 색상 변경 */
+        header:hover .hamburger-menu span {
+            background-color: #333; /* 헤더 호버 시 어두운 색으로 변경 */
+        }
+
+        /* 하위 메뉴 스타일링 */
+        .dropdown-menu a {
+            white-space: nowrap; /* 텍스트가 한 줄에 표시되도록 */
+            font-size: 0.95rem; /* 하위 메뉴 폰트 크기 조정 */
+            display: block; /* 링크 전체 영역 클릭 가능하도록 */
+            padding: 0.5rem 1rem; /* px-4 py-2 */
+            color: #4a5568; /* text-gray-800 */
+            transition: background-color 0.3s;
+            border-radius: 0.375rem; /* rounded-md */
+        }
+        .dropdown-menu a:hover {
+            background-color: #f7fafc; /* hover:bg-gray-100 */
+        }
+
+        /* 관심고객등록 버튼 스타일 */
+        .customer-info .registration-btn {
+            background-color: #E2681F; /* 원본 웹사이트 색상 참고 */
+            color: white;
+            padding: 0.4rem 0.8rem; /* Reduced padding */
+            border-radius: 0.5rem;
+            font-weight: 600;
+            font-size: 0.9rem; /* Slightly smaller font */
+            transition: background-color 0.3s, transform 0.3s; /* transform 추가 */
+        }
+        .customer-info .registration-btn:hover {
+            background-color: #c75a1a;
+            transform: scale(1.05); /* 호버 시 확대 */
+        }
+
+        /* 데스크톱 전화번호 링크 스타일 */
+        .desktop-call-number {
+            transition: color 0.3s ease-in-out;
+            /* 전화번호에만 적용되는 애니메이션 */
+            animation: phone-pulse-animation 0.8s infinite;
+        }
+
+        /* 하위 메뉴 표시를 위한 V 표시 스타일 */
+        .has-submenu span {
+            margin-left: 0.25rem; /* 텍스트와 V 표시 사이 간격 */
+            font-size: 0.75em; /* V 표시 크기 조정 */
+            vertical-align: middle; /* 텍스트와 세로 정렬 */
+        }
+
+        /* Header initial state (transparent) */
+        header {
+            background-color: transparent;
+            box-shadow: none; /* No shadow initially */
+            transition: background-color 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+            height: var(--header-height); /* Set header height based on variable */
+            z-index: 50; /* Ensure header is always on top */
+        }
+
+        /* Default text color for header links/elements */
+        header a {
+            color: white; /* Default white text */
+            transition: color 0.3s ease-in-out;
+        }
+        header .hamburger-menu span {
+            background-color: white; /* Default white hamburger icon */
+            transition: background-color 0.3s ease-in-out;
+        }
+        header .registration-btn {
+            background-color: #E2681F; /* Specific button color */
+            color: white; /* Button text always white */
+        }
+        /* 데스크톱 전화번호 기본 색상 */
+        header .desktop-call-number {
+            color: white;
+        }
+
+        /* When header is scrolled down or hovered */
+        header.header-solid,
+        header:hover { /* Apply solid styles on scroll OR hover */
+            background-color: white;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        header.header-solid a,
+        header:hover a { /* For general links, change to dark */
+            color: #333;
+        }
+
+        header.header-solid .hamburger-menu span,
+        header:hover .hamburger-menu span {
+            background-color: #333; /* Darken hamburger menu when header is solid/hovered */
+        }
+
+        /* Specific hover for registration button - maintain original colors */
+        header.header-solid .registration-btn,
+        header:hover .registration-btn {
+            background-color: #E2681F;
+            color: white;
+        }
+        header.header-solid .registration-btn:hover,
+        header:hover .registration-btn:hover {
+            background-color: #c75a1a; /* Darken on hover */
+        }
+
+        /* Specific hover for header title - maintain blue on hover */
+        header.header-solid .text-blue-600,
+        header:hover .text-blue-600 {
+            color: #2563eb; /* Blue for title on hover */
+        }
+
+        /* 데스크톱 전화번호 색상 변경 (스크롤/호버 시) */
+        header.header-solid .desktop-call-number,
+        header:hover .desktop-call-number {
+            color: #333; /* Dark text color on scroll/hover */
+        }
+        /* Ensure dropdown menu z-index is correct */
+        .dropdown-menu {
+            z-index: 51; /* 메인 헤더 위에 오도록 */
+        }
+
+        /* Custom styles for the logo text - Mobile First */
+        .logo-text-wrapper {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            line-height: 1.2; /* Adjust line height for better spacing */
+            font-weight: bold; /* Keep overall bold for readability */
+        }
+        .logo-text-wrapper span {
+            transition: color 0.3s ease-in-out, transform 0.3s ease-in-out; /* Add transform to transition */
+        }
+        .logo-text-wrapper .top-line {
+            font-size: 1.2rem; /* Smaller default for mobile */
+        }
+        .logo-text-wrapper .emphasized-word {
+            font-family: 'Jua', sans-serif;
+            font-size: 1.8rem; /* Smaller default for mobile */
+            color: #E2681F; /* 찐한 오렌지색으로 변경 */
+        }
+
+        /* Specific color for emphasized word in logo when header is solid/hovered */
+        header.header-solid .logo-text-wrapper .emphasized-word,
+        header:hover .logo-text-wrapper .emphasized-word {
+            color: #E2681F; /* Change to orange for consistency with button */
+        }
+
+        /* Hero section specific styles */
+        .hero-emphasized-word {
+            color: #E2681F; /* 히어로 섹션의 "우미린" 글자색을 찐한 주황색으로 변경 */
+            /* 애니메이션 효과 추가 */
+            animation: float 3s ease-in-out infinite; /* float 애니메이션을 3초 간격으로 무한 반복 */
+            display: inline-block; /* 애니메이션 적용을 위해 inline-block으로 설정 */
+        }
+
+        /* Keyframes for float animation */
+        @keyframes float {
+            0% {
+                transform: translateY(0px);
+            }
+            50% {
+                transform: translateY(-10px); /* 위로 약간 이동 */
+            }
+            100% {
+                transform: translateY(0px);
+            }
+        }
+
+        /* Phone number pulse animation (only scale, no shadow) */
+        @keyframes phone-pulse-animation {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); } /* Slightly larger pulse */
+        }
+
+
+        @media (min-width: 768px) { /* md breakpoint */
+            .logo-text-wrapper .top-line {
+                font-size: 1.4rem; /* Original size for desktop */
+            }
+            .logo-text-wrapper .emphasized-word {
+                font-size: 2.2rem; /* Original size for desktop */
+            }
+        }
+
+        /* General Section Styling for Mobile (default) */
+        section {
+            /* 섹션 자체의 좌우 패딩 제거 -> 콘텐츠는 내부 컨테이너로 제어 */
+            padding-left: 0;
+            padding-right: 0;
+            /* 모든 섹션에 통일된 상하 패딩 및 하단 마진 적용 */
+            padding-top: 2rem; /* py-8 */
+            padding-bottom: 2rem; /* py-8 */
+            margin-bottom: 2rem; /* mb-8 (섹션 간 간격) */
+            border-radius: 0; /* 모바일에서는 모서리 둥글게 하지 않음 */
+            box-shadow: none; /* 모바일에서는 그림자 없앰 */
+            background-color: transparent; /* 기본 배경 투명 */
+            border-top: 1px solid #e5e7eb; /* border-gray-200 */
+        }
+
+        /* 히어로 섹션은 상단 경계선에서 제외 */
+        .hero-section {
+            border-top: none;
+        }
+
+        /* Hero Section adjustments for proper layout */
+        .hero-section {
+            min-height: 100vh; /* Ensure it takes at least full viewport height */
+            padding-top: var(--header-height); /* Push content down below the fixed header */
+            box-sizing: border-box; /* Include padding in height calculation */
+            display: flex; /* Use flex to center content */
+            align-items: center; /* Center items vertically */
+            justify-content: center; /* Center items horizontally */
+            position: relative; /* Needed for background image and overlay */
+            background-size: cover;
+            background-position: center;
+            /* 배경 이미지 밝기 및 채도 개선 */
+            filter: brightness(1.2) saturate(1.2); /* 밝기 20% 증가, 채도 20% 증가 */
+        }
+        .hero-section > .absolute.inset-0 {
+            border-radius: 0.75rem; /* rounded-xl on desktop, needs to apply to overlay too */
+        }
+        @media (min-width: 768px) {
+            .hero-section {
+                border-radius: 0.75rem; /* rounded-xl */
+            }
+        }
+
+
+        /* Specific override for aerial-vr for mobile - ensure it takes full height */
+        #aerial-vr {
+            padding-top: 0;
+            padding-bottom: 0;
+            margin-bottom: 0;
+            border-radius: 0;
+            box-shadow: none;
+            background-color: transparent;
+            border-top: 1px solid #e5e7eb; /* border-gray-200 */
+        }
+        #aerial-vr .vr-iframe-container {
+            width: 100%;
+            height: calc(100vh - var(--header-height)); /* Fills remaining screen height */
+            display: flex;
+            flex-direction: column; /* Allow button to stack below iframe */
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            margin-bottom: 0; /* Ensure no margin below iframe */
+            position: relative; /* For positioning the button */
+        }
+        #aerial-vr iframe {
+            width: 100%;
+            height: 100%; /* Fill parent container */
+            max-width: 100%;
+            max-height: 100%;
+            display: block;
+            touch-action: pan-x pan-y !important; /* 터치 동작 허용 - 강화 */
+        }
+
+        /* New styles for E-Model House section (mobile first) */
+        .e-model-house-section {
+            padding-top: 0; /* Remove top padding for mobile */
+            padding-bottom: 0; /* Remove bottom padding for mobile */
+            margin-bottom: 0; /* Remove bottom margin for mobile */
+            border-radius: 0; /* Remove border-radius to fill edges */
+            box-shadow: none; /* Remove shadow to fill edges */
+            background-color: transparent; /* Ensure no background color interferes */
+            border-top: 1px solid #e5e7eb; /* border-gray-200 */
+        }
+
+        /* Mobile VR section title styling */
+        .vr-section-title {
+            display: block; /* Always display on mobile */
+            text-align: center;
+            padding: 1rem 0; /* Add padding for spacing */
+            margin-bottom: 1rem; /* Space below title */
+        }
+        .vr-section-title h2 {
+            font-size: 1.875rem; /* text-3xl */
+            font-weight: 700; /* font-bold */
+            color: #2563eb; /* text-blue-700 */
+            margin-bottom: 0.5rem;
+        }
+        .vr-section-title p {
+            font-size: 1.125rem; /* text-lg */
+            color: #4a5568; /* text-gray-700 */
+        }
+
+
+        .e-model-house-section .box {
+            margin-top: 0; /* Remove margin-top for mobile to allow full height */
+        }
+
+        /* For mobile, iframe-wrap should take full height and mo-vr should be hidden */
+        .e-model-house-section .iframe-wrap {
+            position: relative;
+            width: 100%;
+            padding-bottom: 0; /* Remove aspect ratio padding for full height */
+            height: calc(100vh - var(--header-height)); /* Fills remaining screen height */
+            overflow: hidden;
+            border-radius: 0; /* Remove border-radius to fill edges */
+            display: block; /* Ensure iframe is displayed on mobile */
+        }
+
+        .e-model-house-section .iframe-wrap iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border: none;
+            touch-action: pan-x pan-y !important; /* 터치 동작 허용 - 강화 */
+        }
+
+        .e-model-house-section .mo-vr {
+            display: none; /* Hide mobile VR placeholder on mobile */
+            margin-top: 20px;
+        }
+
+        /* Desktop Section Styling */
+        @media (min-width: 768px) { /* md breakpoint */
+            section {
+                padding-top: 4rem; /* py-16 */
+                padding-bottom: 4rem; /* py-16 */
+                margin-bottom: 5rem; /* mb-20 */
+                border-radius: 0.75rem; /* rounded-xl */
+                box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05); /* shadow-lg */
+                background-color: white;
+                border-top: none; /* 데스크톱에서는 섹션 자체가 구별되므로 경계선 제거 */
+            }
+            /* Re-apply desktop styles for aerial-vr */
+            #aerial-vr {
+                padding-top: 4rem; /* py-16 */
+                padding-bottom: 4rem; /* py-16 */
+                margin-bottom: 5rem; /* mb-20 */
+                border-radius: 0.75rem; /* rounded-xl */
+                box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05); /* shadow-lg */
+                background-color: white;
+                border-top: none; /* 데스크톱에서는 섹션 자체가 구별되므로 경계선 제거 */
+            }
+            #aerial-vr .vr-iframe-container {
+                height: 70vh; /* Desktop height */
+                margin-bottom: 0;
+            }
+
+            /* Desktop adjustments for E-Model House section */
+            .e-model-house-section {
+                padding-top: 4rem; /* py-16 */
+                padding-bottom: 4rem; /* py-16 */
+                margin-bottom: 5rem; /* mb-20 */
+                border-radius: 0.75rem; /* rounded-xl */
+                box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05); /* shadow-lg */
+                background-color: white;
+                border-top: none; /* 데스크톱에서는 섹션 자체가 구별되므로 경계선 제거 */
+            }
+            /* Show title-wrap on desktop */
+            .e-model-house-section .vr-section-title {
+                display: block;
+                margin-top: 0; /* Reset margin-top */
+                margin-bottom: 30px; /* Re-apply desktop margin-bottom */
+            }
+            .e-model-house-section .box {
+                margin-top: 20px; /* Re-apply desktop margin-top */
+            }
+            .e-model-house-section .iframe-wrap {
+                height: 0; /* Reset height for desktop */
+                padding-bottom: 56.25%; /* Re-add aspect ratio padding for desktop */
+                border-radius: 8px; /* Re-apply border-radius */
+                display: block; /* Ensure iframe is displayed on desktop */
+            }
+            .e-model-house-section .mo-vr {
+                display: none; /* Hide mobile VR placeholder on desktop */
+            }
+        }
+
+        /* Mobile Next Section Button Styling */
+        /* 이 컨테이너는 이제 모바일에서 숨겨지므로 스타일은 더 이상 중요하지 않습니다. */
+        .next-section-button-container {
+            display: none; /* 모바일에서 버튼 컨테이너를 완전히 숨깁니다. */
+        }
+
+        /* 데스크톱에서는 버튼이 여전히 숨겨져야 하므로 md:hidden을 유지합니다. */
+        @media (min-width: 768px) {
+            .next-section-button-container {
+                display: none;
+            }
+        }
+
+        /* Mobile Menu Animation Styles */
+        #mobile-menu {
+            position: absolute; /* Added: Ensure it overlays content */
+            top: var(--header-height); /* Added: Position below header */
+            left: 0; /* Added: Align to left edge */
+            width: 100%; /* Added: Take full width */
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.5s ease-in-out, opacity 0.5s ease-in-out;
+            opacity: 0;
+            visibility: hidden;
+            z-index: 49; /* Ensure it's below the header when closed, but above main content */
+        }
+
+        #mobile-menu.open-menu {
+            max-height: calc(100vh - var(--header-height)); /* Adjust to fill remaining viewport height */
+            opacity: 1;
+            visibility: visible;
+            overflow-y: auto; /* Allow scrolling if content exceeds max-height */
+            z-index: 55; /* Bring it to the same level as header when open, or higher if needed */
+            pointer-events: auto; /* Explicitly enable pointer events when open */
+        }
+
+        /* Mobile Menu Overlay Styles */
+        #mobile-menu-overlay {
+            opacity: 0;
+            pointer-events: none; /* Allows clicks to pass through when hidden */
+            transition: opacity 0.5s ease-in-out;
+        }
+
+        #mobile-menu-overlay.open-overlay {
+            opacity: 0.5; /* Or whatever opacity you prefer */
+            pointer-events: auto; /* Allows clicks to be captured when visible */
+        }
+
+        /* Ensure interactive elements have pointer cursor */
+        #mobile-menu a,
+        #mobile-menu button {
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800">
+
+    <div id="mobile-menu-overlay" class="fixed inset-0 bg-black opacity-0 z-40 transition-opacity duration-500 pointer-events-none"></div>
+
+    <header class="fixed top-0 left-0 w-full py-4 px-6 md:px-12 rounded-b-lg transition-all duration-300">
+        <div class="container mx-auto flex justify-between items-center">
+            <a href="#" class="logo-text-wrapper">
+                <span class="top-line">장안</span>
+                <span class="bottom-line-group">
+                    <span class="emphasized-word">우미</span>
+                    <span class="emphasized-word">린</span>
+                </span>
+            </a>
+
+            <nav id="desktop-nav" class="hidden md:flex space-x-8">
+                <div class="relative"> <a href="#business" class="text-lg font-medium text-white transition duration-300 py-2 px-3 rounded-md has-submenu">사업안내<span>▾</span></a>
+                    <div class="dropdown-menu">
+                        <a href="#business" class="block px-4 py-2 text-gray-800 hover:bg-gray-100 rounded-md">사업개요</a>
+                        <a href="#business-location" class="block px-4 py-2 text-gray-800 hover:bg-gray-100 rounded-md">사업지안내</a>
+                        <a href="#directions" class="block px-4 py-2 text-gray-800 hover:bg-gray-100 rounded-md">오시는 길</a> </div>
+                </div>
+                <div class="relative">
+                    <a href="#floor-59a" class="text-lg font-medium text-white transition duration-300 py-2 px-3 rounded-md has-submenu">평면안내<span>▾</span></a>
+                    <div class="dropdown-menu">
+                        <a href="#floor-59a" class="block px-4 py-2 text-gray-800 hover:bg-gray-100 rounded-md">59m² A 타입</a>
+                        <a href="#floor-59b" class="block px-4 py-2 text-gray-800 hover:bg-gray-100 rounded-md">59m² B 타입</a>
+                        <a href="#floor-84a" class="block px-4 py-2 text-gray-800 hover:bg-gray-100 rounded-md">84m² A 타입</a>
+                    </div>
+                </div>
+                <div class="relative"> <a href="#complex-plan" class="text-lg font-medium text-white transition duration-300 py-2 px-3 rounded-md has-submenu">단지안내<span>▾</span></a>
+                    <div class="dropdown-menu">
+                        <a href="#complex-plan" class="block px-4 py-2 text-gray-800 hover:bg-gray-100 rounded-md">단지설계</a>
+                        <a href="#complex-chart" class="block px-4 py-2 text-gray-800 hover:bg-gray-100 rounded-md">단지배치도</a>
+                        <a href="#complex-community" class="block px-4 py-2 text-gray-800 hover:bg-gray-100 rounded-md">커뮤니티</a>
+                        <a href="#complex-airclean" class="block px-4 py-2 text-gray-800 hover:bg-gray-100 rounded-md">에어클린시스템</a>
+                        <a href="#complex-iot" class="block px-4 py-2 text-gray-800 hover:bg-gray-100 rounded-md">린 IoT</a>
+                    </div>
+                </div>
+                <div class="relative">
+                    <a href="#aerial-vr" class="text-lg font-medium text-white transition duration-300 py-2 px-3 rounded-md has-submenu">VR 체험<span>▾</span></a>
+                    <div class="dropdown-menu">
+                        <a href="#aerial-vr" class="block px-4 py-2 text-gray-800 hover:bg-gray-100 rounded-md">항공 VR</a>
+                        <a href="#e-model-house-59a" class="block px-4 py-2 text-gray-800 hover:bg-gray-100 rounded-md">E-모델하우스 (59A)</a>
+                        <a href="#e-model-house-84a" class="block px-4 py-2 text-gray-800 hover:bg-gray-100 rounded-md">E-모델하우스 (84A)</a>
+                    </div>
+                </div>
+                <div class="relative"> <a href="#brand" class="text-lg font-medium text-white transition duration-300 py-2 px-3 rounded-md has-submenu">브랜드<span>▾</span></a>
+                    <div class="dropdown-menu">
+                        <a href="#brand" class="block px-4 py-2 text-gray-800 hover:bg-gray-100 rounded-md">브랜드</a>
+                    </div>
+                </div>
+                </nav>
+
+            <div class="hidden md:flex customer-info gap-4">
+                <button class="registration-btn rounded-md text-white px-3 py-1.5 transition duration-300 hover:opacity-80 hover:scale-105" onclick="scrollToSection('customer-registration-section')">
+                    관심고객등록
+                </button>
+                <a href="tel:010-5957-1400" class="desktop-call-number flex items-center text-white font-bold text-lg transition-colors duration-300">
+                    <span class="text-base font-normal">(010)</span>
+                    <span class="text-xl font-bold ml-1">5957.1400</span>
+                </a>
+            </div>
+
+            <div class="md:hidden flex items-center space-x-4">
+                <a href="tel:010-5957-1400" class="flex items-center text-orange-500 hover:text-orange-600 transition-colors duration-300 font-bold text-lg">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/>
+                    </svg>
+                </a>
+                <button id="mobile-menu-button" class="hamburger-menu focus:outline-none p-2 rounded-md">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </button>
+            </div>
+        </div>
+
+        <nav id="mobile-menu" class="md:hidden bg-white rounded-md shadow-lg py-2">
+            <div class="relative">
+                <button class="mobile-submenu-toggle w-full text-left px-6 py-3 text-gray-800 hover:bg-gray-100 rounded-md flex justify-between items-center" data-submenu-id="business-mobile-submenu">
+                    사업안내 <span class="ml-2">▾</span>
+                </button>
+                <div id="business-mobile-submenu" class="pl-8 hidden">
+                    <a href="#business" class="block px-6 py-2 text-gray-700 hover:bg-gray-50 rounded-md">사업개요</a>
+                    <a href="#business-location" class="block px-6 py-2 text-gray-700 hover:bg-gray-50 rounded-md">사업지안내</a>
+                    <a href="#directions" class="block px-6 py-2 text-gray-700 hover:bg-gray-50 rounded-md">오시는 길</a> </div>
+            </div>
+            <div class="relative">
+                <button class="mobile-submenu-toggle w-full text-left px-6 py-3 text-gray-800 hover:bg-gray-100 rounded-md flex justify-between items-center" data-submenu-id="floor-plan-mobile-submenu">
+                    평면안내 <span class="ml-2">▾</span>
+                </button>
+                <div id="floor-plan-mobile-submenu" class="pl-8 hidden">
+                    <a href="#floor-59a" class="block px-6 py-2 text-gray-700 hover:bg-gray-50 rounded-md">59m² A 타입</a>
+                    <a href="#floor-59b" class="block px-6 py-2 text-gray-700 hover:bg-gray-50 rounded-md">59m² B 타입</a>
+                    <a href="#floor-84a" class="block px-6 py-2 text-gray-700 hover:bg-gray-50 rounded-md">84m² A 타입</a>
+                </div>
+            </div>
+            <div class="relative">
+                <button class="mobile-submenu-toggle w-full text-left px-6 py-3 text-gray-800 hover:bg-gray-100 rounded-md flex justify-between items-center" data-submenu-id="complex-mobile-submenu">
+                    단지안내 <span class="ml-2">▾</span>
+                </button>
+                <div id="complex-mobile-submenu" class="pl-8 hidden">
+                    <a href="#complex-plan" class="block px-6 py-2 text-gray-700 hover:bg-gray-50 rounded-md">단지설계</a>
+                    <a href="#complex-chart" class="block px-6 py-2 text-gray-700 hover:bg-gray-50 rounded-md">단지배치도</a>
+                    <a href="#complex-community" class="block px-6 py-2 text-gray-700 hover:bg-gray-50 rounded-md">커뮤니티</a>
+                    <a href="#complex-airclean" class="block px-6 py-2 text-gray-700 hover:bg-gray-50 rounded-md">에어클린시스템</a>
+                    <a href="#complex-iot" class="block px-6 py-2 text-gray-700 hover:bg-gray-50 rounded-md">린 IoT</a>
+                </div>
+            </div>
+            <div class="relative">
+                <button class="mobile-submenu-toggle w-full text-left px-6 py-3 text-gray-800 hover:bg-gray-100 rounded-md flex justify-between items-center" data-submenu-id="vr-mobile-submenu">
+                    VR 체험 <span class="ml-2">▾</span>
+                </button>
+                <div id="vr-mobile-submenu" class="pl-8 hidden">
+                    <a href="#aerial-vr" class="block px-6 py-2 text-gray-700 hover:bg-gray-50 rounded-md">항공 VR</a>
+                    <a href="#e-model-house-59a" class="block px-6 py-2 text-gray-700 hover:bg-gray-50 rounded-md">E-모델하우스 (59A)</a>
+                    <a href="#e-model-house-84a" class="block px-6 py-2 text-gray-700 hover:bg-gray-50 rounded-md">E-모델하우스 (84A)</a>
+                </div>
+            </div>
+            <div class="relative">
+                <button class="mobile-submenu-toggle w-full text-left px-6 py-3 text-gray-800 hover:bg-gray-100 rounded-md flex justify-between items-center" data-submenu-id="brand-mobile-submenu">
+                    브랜드 <span class="ml-2">▾</span>
+                </button>
+                <div id="brand-mobile-submenu" class="pl-8 hidden">
+                    <a href="#brand" class="block px-6 py-2 text-gray-700 hover:bg-gray-50 rounded-md">브랜드</a>
+                </div>
+            </div>
+            <div class="px-6 py-3 border-t border-gray-200 mt-2 flex flex-col space-y-2">
+                <a href="#customer-registration-section" class="registration-btn w-full text-center py-2 px-4 rounded-md text-white font-semibold bg-orange-500 hover:bg-orange-600 transition duration-300 hover:scale-105">
+                    관심고객등록
+                </a>
+                </div>
+            <div class="px-6 py-3 border-t border-gray-200 mt-2">
+                <a href="tel:010-5957-1400" class="flex items-center justify-center text-orange-600 font-bold text-lg">
+                    <span class="text-base font-normal">(010)</span>
+                    <span class="text-xl font-bold ml-1">5957.1400</span>
+                </a>
+            </div>
+        </nav>
+    </header>
+
+    <section class="hero-section bg-cover bg-center text-white text-center rounded-b-lg"
+             style="background-image: url('https://bsj.lynn.co.kr/upload/editor/a728b09aaca346cb858dafdbf83f5b14.png');">
+        <div class="absolute inset-0 bg-black opacity-50 rounded-b-lg"></div>
+        <div class="relative z-10 p-6 max-w-3xl mx-auto bg-white bg-opacity-20 backdrop-blur-sm rounded-xl shadow-2xl">
+            <h1 class="text-5xl md:text-7xl font-extrabold mb-4 leading-tight">
+                <span class="block text-blue-200">새로운 삶의 시작,</span>
+                <span class="block text-white">장안 <span class="hero-emphasized-word">우미린</span>과 함께</span>
+            </h1>
+            <p class="text-xl md:text-2xl mb-8 font-light">
+                최고의 품질과 혁신적인 디자인으로 당신의 미래를 건설합니다.
+            </p>
+            <div class="flex flex-col sm:flex-row justify-center items-center gap-4">
+                <a href="#business" class="inline-block bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 px-8 rounded-full text-lg transition duration-300 transform hover:scale-105 shadow-lg hidden md:block">
+                    자세히 알아보기
+                </a>
+                <a href="#reservation-section" class="inline-block bg-green-600 hover:bg-green-700 text-white font-bold py-4 px-8 rounded-full text-lg transition duration-300 transform hover:scale-105 shadow-lg">
+                    방문예약하기
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <main id="main-content" class="container mx-auto md:px-12">
+        <section id="business">
+            <div class="px-4 md:px-12"> <h2 class="text-4xl font-bold text-center text-blue-700 mb-12 md:mt-12">사업개요</h2>
+                <div class="flex flex-col items-center p-0 md:p-8">
+                    <div class="w-full mb-8">
+                        <img src="https://bsj.lynn.co.kr/upload/editor/80ce3b8ca2414f2383c29eb7e81da2ed.png"
+                             alt="사업개요 이미지"
+                             class="rounded-xl shadow-xl w-full h-auto object-cover">
+                    </div>
+                    <div id="business-overview" class="w-full md:w3/4 lg:w-2/3 p-4 md:p-0">
+                        <h3 class="text-3xl font-semibold text-gray-900 mb-6">사업개요</h3>
+                        <div class="text-lg text-gray-700 leading-relaxed mb-4 space-y-2">
+                            <p><strong class="font-semibold">사업명:</strong> 부산 장안 지구 우미린 프리미어</p>
+                            <p><strong class="font-semibold">위치:</strong> 부산광역시 기장군 장안읍 좌동리 부산 장안 지구 B-1 블록</p>
+                            <p><strong class="font-semibold">규모:</b> 59, 84m² 총 419 세대</p>
+                            <p><strong class="font-semibold">시행:</b> (주)우미글로벌</p>
+                            <p><strong class="font-semibold">시공:</b> 우미 건설(주)</p>
+                        </div>
+                        <p class="text-sm text-gray-600 mt-8 leading-relaxed">
+                            <strong class="font-semibold">※ 본 홈페이지는 제작 및 편집 과정상 오류가 발생할 수 있습니다.</strong><br>
+                            ※ 본 홈페이지에 사용된 사진, 일러스트 및 CG 등은 소비자의 이해를 돕기 위해 제작된 것으로 실제와 차이가 있으며, 사업지에 인접한 아파트 (예정), 상업 시설 및 기타 건축물은 반드시 토지 이용 계획도를 참고하시기 바랍니다. 일부 세대의 경우 향후 건축물 배치에 따라 조망권, 일조권 등에 영향을 받을 수 있습니다.<br>
+                            ※ 상기 투시도는 현장 이미지를 개략적으로 표기한 것으로 단지 레벨, 주변 환경, 도로 선형, 주요 시설물 등 실제와 일부 상이할 수 있으니, 궁금하신 사항이 있으시면 반드시 현장 방문 혹은 견본주택으로 내방하시어 확인하여 주시기 바랍니다.<br>
+                            ※ 소비자의 올바른 권익 보호를 위해 법정 계량 단위 (m²)를 사용합니다.<br>
+                            ※ 하자 등에 따른 소비자 피해 보상은 주택 법령에 따라 적용됩니다.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="business-location">
+            <div class="px-4 md:px-12"> <h2 class="text-4xl font-bold text-center text-blue-700 mb-12 md:mt-12">사업지안내</h2>
+                <div class="flex flex-col items-center p-0 md:p-8">
+                    <div class="w-full mb-8">
+                        <img src="https://bsj.lynn.co.kr/upload/editor/d7890f16782c4963b219ee136c23e744.png"
+                             alt="사업지안내 이미지"
+                             class="rounded-xl shadow-xl w-full h-auto object-cover">
+                    </div>
+                    <div class="w-full md:w-3/4 lg:w-2/3 text-lg text-gray-700 leading-relaxed space-y-4 p-4 md:p-0">
+                        <p>장안 우미린은 부산광역시 기장군 장안읍 좌동리에 위치하여 쾌적한 자연환경과 편리한 도시 인프라를 동시에 누릴 수 있는 최적의 입지를 자랑합니다.</p>
+                        <h3 class="text-2xl font-semibold text-gray-900 mt-8 mb-4">교통 환경</h3>
+                        <ul class="list-disc list-inside space-y-2">
+                            <li>동해고속도로 장안IC 인접으로 부산 도심 및 울산으로의 쾌속 이동 가능</li>
+                            <li>국도 14호선, 7호선 등 주요 도로망 접근 용이</li>
+                            <li>부산외곽순환고속도로를 통한 광역 교통망 이용 편리</li>
+                        </ul>
+                        <h3 class="text-2xl font-semibold text-gray-900 mt-8 mb-4">생활 인프라</h3>
+                        <ul class="list-disc list-inside space-y-2">
+                            <li>단지 인근 상업시설 및 편의시설 이용 편리</li>
+                            <li>장안읍 행정복지센터, 장안도서관 등 공공시설 근접</li>
+                            <li>부산프리미엄 아울렛 등 쇼핑시설 이용 편리</li>
+                        </ul>
+                        <h3 class="text-2xl font-semibold text-gray-900 mt-8 mb-4">의료 인프라</h3>
+                        <ul class="list-disc list-inside space-y-2">
+                            <li>동남권 원자력의학원, 서울대학교 중입자치료센터 등 편리한 의료 인프라</li>
+                        </ul>
+                        <h3 class="text-2xl font-semibold text-gray-900 mt-8 mb-4">교육 환경</h3>
+                        <ul class="list-disc list-inside space-y-2">
+                            <li>장안초, 장안중, 장안고 등 안심 도보 통학권</li>
+                            <li>단지 인근 학원가 및 교육 시설 이용 편리</li>
+                        </ul>
+                        <h3 class="text-2xl font-semibold text-gray-900 mt-8 mb-4">자연 환경</h3>
+                        <ul class="list-disc list-inside space-y-2">
+                            <li>좌천천, 장안사 등 쾌적한 자연 환경 인접</li>
+                            <li>단지 주변 공원 및 녹지 공간 풍부</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="aerial-vr">
+            <div class="vr-section-title md:block px-4 md:px-12">
+                <h2 class="text-blue-700">항공 VR</h2>
+                <p class="text-gray-700">위 지도를 통해 항공 VR 체험을 해보세요.</p>
+            </div>
+
+            <div class="flex justify-center items-center w-full vr-iframe-container">
+                <iframe src="https://www.lynn.co.kr/webfile/bsj_sky/jangan_v8/"
+                        frameborder="0"
+                        allowfullscreen="true"
+                        mozallowfullscreen="true"
+                        webkitallowfullscreen="true"
+                        loading="lazy"
+                        referrerpolicy="no-referrer-when-downgrade"
+                        class="rounded-lg shadow-md"
+                        allow="fullscreen; xr-spatial-tracking; vr; gyroscope; accelerometer;">
+                </iframe>
+                </div>
+        </section>
+
+        <section id="e-model-house-59a" class="e-model-house-section">
+            <div class="vr-section-title md:block px-4 md:px-12">
+                <h2 class="text-blue-700">E-모델하우스</h2>
+                <p class="text-gray-700">E-모델하우스 59㎡A</p>
+            </div>
+            <div class="box">
+                <div id="info" class="img-wrap">
+                    <div data-idx="2" class="inner-content block">
+                        <div class="iframe-wrap iframe-vr">
+                            <iframe src="https://players.cupix.com/p/uHO1cokm" allowfullscreen="true" frameborder="0" mozallowfullscreen="true" scrolling="auto" webkitallowfullscreen="true" title="사이버모델하우스"></iframe>
+                            </div>
+                        <div class="mo-vr">
+                            <img src="https://placehold.co/400x225/cccccc/333333?text=Mobile+VR+Placeholder" alt="모바일 VR 미리보기">
+                            <a class="vr_link" href="https://players.cupix.com/p/uHO1cokm" title="사이버모델하우스">E-모델하우스 바로가기</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="e-model-house-84a" class="e-model-house-section">
+            <div class="vr-section-title md:block px-4 md:px-12">
+                <h2 class="text-blue-700">E-모델하우스</h2>
+                <p class="text-gray-700">E-모델하우스 84㎡A</p>
+            </div>
+            <div class="box">
+                <div id="info" class="img-wrap">
+                    <div data-idx="2" class="inner-content block">
+                        <div class="iframe-wrap iframe-vr">
+                            <iframe src="https://players.cupix.com/p/3k9cJE8i" allowfullscreen="true" frameborder="0" mozallowfullscreen="true" scrolling="auto" webkitallowfullscreen="true" title="사이버모델하우스"></iframe>
+                            </div>
+                        <div class="mo-vr">
+                            <img src="https://placehold.co/400x225/cccccc/333333?text=Mobile+VR+Placeholder" alt="모바일 VR 미리보기">
+                            <a class="vr_link" href="https://players.cupix.com/p/3k9cJE8i" title="사이버모델하우스">E-모델하우스 바로가기</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="floor-59a">
+            <div class="px-4 md:px-12"> <h2 class="text-4xl font-bold text-center text-blue-700 mb-12 md:mt-12">59m² A 타입</h2>
+                <div class="flex flex-col items-center gap-8">
+                    <img src="https://bsj.lynn.co.kr/upload/editor/379f749f0cf74373b884f915a8f54b90.png"
+                         alt="59m² A 타입 평면도"
+                         class="rounded-lg shadow-md w-full h-auto object-contain max-w-full">
+                    <img src="https://bsj.lynn.co.kr/upload/editor/13fe52d76d9b4350b0f60d9430a04d6c.png"
+                         alt="59m² A 타입 평면 상세"
+                         class="rounded-lg shadow-md w-full h-auto object-contain max-w-full">
+                    <p class="text-lg text-gray-700 text-center mt-4">실용적인 공간 구성과 채광을 극대화한 설계.</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="floor-59b">
+            <div class="px-4 md:px-12"> <h2 class="text-4xl font-bold text-center text-blue-700 mb-12 md:mt-12">59m² B 타입</h2>
+                <div class="flex flex-col items-center gap-8">
+                    <img src="https://bsj.lynn.co.kr/upload/editor/4f799391e2f746ac96dee7ffe0f6b24f.png"
+                         alt="59m² B 타입 평면도"
+                         class="rounded-lg shadow-md w-full h-auto object-contain max-w-full">
+                    <img src="https://bsj.lynn.co.kr/upload/editor/e1bfc9ca76ee4e739c9220d84e89a72c.png"
+                         alt="59m² B 타입 평면 상세"
+                         class="rounded-lg shadow-md w-full h-auto object-contain max-w-full">
+                    <p class="text-lg text-gray-700 text-center mt-4">넓은 거실과 다이닝 공간으로 가족의 소통을 강조.</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="floor-84a">
+            <div class="px-4 md:px-12"> <h2 class="text-4xl font-bold text-center text-blue-700 mb-12 md:mt-12">84m² A 타입</h2>
+                <div class="flex flex-col items-center gap-8">
+                    <img src="https://bsj.lynn.co.kr/upload/editor/dbe163c198e7414f84fa8042684f4f96.png"
+                         alt="84m² A 타입 평면도"
+                         class="rounded-lg shadow-md w-full h-auto object-contain max-w-full">
+                    <img src="https://bsj.lynn.co.kr/upload/editor/4a17c96fd8f94a86875bf317504b77ae.png"
+                         alt="84m² A 타입 평면 상세"
+                         class="rounded-lg shadow-md w-full h-auto object-contain max-w-full">
+                    <p class="text-lg text-gray-700 text-center mt-4">고급스러운 마감재와 프라이빗한 공간 설계.</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="complex-plan">
+            <div class="px-4 md:px-12"> <h2 class="text-4xl font-bold text-center text-blue-700 mb-12 md:mt-12">단지설계</h2>
+                <div class="flex flex-col items-center gap-8">
+                    <img src="https://bsj.lynn.co.kr/upload/editor/7ab4b989ba684d5d85672896b239ee4e.png"
+                         alt="단지설계 이미지"
+                         class="rounded-lg shadow-md w-full h-auto object-contain max-w-full">
+                    <div class="text-lg text-gray-700 leading-relaxed space-y-4 text-center p-4 md:p-0">
+                        <h3 class="text-2xl font-semibold text-gray-900 mt-8 mb-4">핵심 포인트</h3>
+                        <ul class="list-disc list-inside mx-auto max-w-2xl text-left">
+                            <li><strong class="font-semibold">자연 친화적 설계:</strong> 단지 내 풍부한 녹지 공간과 조경으로 쾌적한 주거 환경을 제공합니다.</li>
+                            <li><strong class="font-semibold">효율적인 동선:</strong> 입주민의 편의를 고려한 보행자 및 차량 동선 분리로 안전하고 편리합니다.</li>
+                            <li><strong class="font-semibold">다양한 커뮤니티 시설:</strong> 피트니스, 독서실 등 다채로운 커뮤니티 시설로 삶의 활력을 더합니다.</li>
+                            <li><strong class="font-semibold">남향 위주 배치:</strong> 채광과 통풍을 극대화하여 쾌적하고 에너지 효율적인 주거 공간을 조성합니다.</li>
+                            <li><strong class="font-semibold">안전하고 스마트한 단지:</strong> 최첨단 보안 시스템과 스마트 IoT 기술로 편리하고 안전한 생활을 보장합니다.</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="complex-chart">
+            <div class="px-4 md:px-12"> <h2 class="text-4xl font-bold text-center text-blue-700 mb-12 md:mt-12">단지배치도</h2>
+                <div class="flex flex-col items-center">
+                    <div class="w-full mb-8">
+                        <img src="https://bsj.lynn.co.kr/upload/editor/172f505a97164994a7510d3ca49831e5.png"
+                             alt="단지배치도 이미지"
+                             class="rounded-lg shadow-md w-full h-auto object-contain max-w-full">
+                    </div>
+                    <p class="text-lg text-gray-700 text-center mt-4">장안 우미린의 효율적인 단지 배치도를 확인하세요.</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="complex-community">
+            <div class="px-4 md:px-12"> <h2 class="text-4xl font-bold text-center text-blue-700 mb-12 md:mt-12">커뮤니티</h2>
+                <div class="flex flex-col items-center gap-8">
+                    <img src="https://bsj.lynn.co.kr/upload/editor/c7ec25fbec734554808d0c4403f30aea.png"
+                         alt="커뮤니티 시설 이미지"
+                         class="rounded-lg shadow-md w-full h-auto object-contain max-w-full">
+                    <p class="text-lg text-gray-700 text-center mt-4">장안 우미린의 다채로운 커뮤니티 시설에서 활기찬 생활을 누리세요.</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="complex-airclean">
+            <div class="px-4 md:px-12"> <h2 class="text-4xl font-bold text-center text-blue-700 mb-12 md:mt-12">에어클린시스템</h2>
+                <div class="flex flex-col items-center gap-8">
+                    <img src="https://bsj.lynn.co.kr/upload/editor/b453e451ebdb490cb85a96e3a24e7747.png"
+                         alt="에어클린시스템 이미지"
+                         class="rounded-lg shadow-md w-full h-auto object-contain max-w-full">
+                    <p class="text-lg text-gray-700 text-center mt-4">장안 우미린의 에어클린시스템으로 쾌적한 실내 공기를 경험하세요.</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="complex-iot">
+            <div class="px-4 md:px-12"> <h2 class="text-4xl font-bold text-center text-blue-700 mb-12 md:mt-12">린 IoT</h2>
+                <div class="flex flex-col items-center gap-8">
+                    <img src="https://bsj.lynn.co.kr/upload/editor/ca5a5992265a454f85e5068c770ef1ca.png"
+                         alt="린 IoT 시스템 이미지"
+                         class="rounded-lg shadow-md w-full h-auto object-contain max-w-full">
+                    <p class="text-lg text-gray-700 text-center mt-4">장안 우미린의 첨단 린 IoT 시스템으로 편리하고 스마트한 생활을 경험하세요.</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="brand">
+            <div class="px-4 md:px-12"> <h2 class="text-4xl font-bold text-center text-blue-700 mb-12 md:mt-12">브랜드</h2>
+                <div id="brand-info" class="text-center">
+                    <p class="text-lg text-gray-700 leading-relaxed mb-6">
+                        장안 우미린은 고객의 삶의 질을 향상시키고, 미래 가치를 창조하는 데 기여하는 브랜드입니다. 우리는 신뢰와 혁신을 바탕으로 지속적인 성장을 추구하며, 고객에게 최고의 주거 경험을 제공하기 위해 노력합니다.
+                    </p>
+                    <img src="https://bsj.lynn.co.kr/upload/editor/0bc1c42b96474f45a024becad5cdb29c.png"
+                         alt="브랜드 로고" class="mx-auto rounded-lg shadow-md max-w-full h-auto mb-8">
+                    <div class="text-lg text-gray-700 leading-relaxed space-y-4">
+                        <h3 class="2xl font-semibold text-gray-900 mt-8 mb-4">시공사의 안전성</h3>
+                        <p>우미 건설(주)는 오랜 경험과 기술력을 바탕으로 안전하고 튼튼한 주거 공간을 제공합니다. 엄격한 품질 관리와 철저한 공정 준수를 통해 고객의 안전을 최우선으로 생각하며, 신뢰할 수 있는 시공으로 높은 만족도를 선사합니다.</p>
+                        <p>우미 건설(주)는 지속적인 연구 개발과 혁신적인 기술 도입을 통해 건축물의 안전성을 더욱 강화하고 있습니다. 지진 및 화재 등 재난 상황에 대비한 설계와 최신 안전 시스템을 적용하여 입주민들이 안심하고 생활할 수 있는 환경을 조성합니다.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="directions">
+            <div class="px-4 md:px-12"> <h2 class="text-4xl font-bold text-center text-blue-700 mb-12 md:mt-12">오시는 길</h2>
+                <div class="flex flex-col items-center md:flex-row md:justify-between md:items-center w-full p-4 md:p-0">
+                    <div class="mb-4 md:mb-0 text-center md:text-left">
+                        <h3 class="text-3xl font-semibold text-gray-900 mb-6">모델하우스 위치</h3>
+                        <p class="text-lg text-gray-700 mb-4">
+                            부산 기장군 정관읍 매학리 777-9
+                        </p>
+                        <p class="text-lg text-gray-700 mb-4">
+                            운영 시간: 오전 10시 ~ 오후 6시
+                        </p>
+                        <p class="text-lg text-gray-700 mb-2">
+                            문의 전화: <span class="font-semibold">(010)5957.1400</span>
+                        </p>
+                        <p class="text-lg text-gray-700 mb-4">
+                            VIP 전문 상담사: 정기영 부장
+                        </p>
+                    </div>
+                    <div class="w-full md:w-auto flex justify-center md:justify-end"> <a href="https://map.naver.com/v5/search/부산%20기장군%20정관읍%20매학리%20777-9" target="_blank" class="inline-block bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 px-8 rounded-lg text-xl text-center transition duration-300 transform hover:scale-105 shadow-md w-full md:w-auto">
+                            네이버 지도로 보기
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="reservation-section">
+            <div class="px-4 md:px-12"> <h2 class="text-4xl font-bold text-center text-blue-700 mb-12 md:mt-12">방문 예약하기</h2>
+                <div class="text-center text-lg text-gray-700 leading-relaxed space-y-4">
+                    <p>장안 우미린 모델하우스 방문 예약을 원하시면 아래 정보를 참고하시거나, 직접 전화 문의를 해주세요.</p>
+                    <p>쾌적한 관람을 위해 사전 예약제를 운영하고 있습니다.</p>
+                    <div class="mt-8 p-6 bg-blue-50 rounded-lg shadow-inner inline-block">
+                        <p class="text-xl font-semibold text-gray-900 mb-2">예약 문의</p>
+                        <p class="text-2xl font-bold text-blue-700 mb-4">010-5957-1400</p>
+                        <p class="text-md text-gray-600">상담 시간: 오전 10시 ~ 오후 6시 (주말 및 공휴일 포함)</p>
+                        <a href="sms:010-5957-1400?body=장안 우미린 모델하우스 방문 예약합니다.%0A성함: %0A연락처: %0A방문인원: %0A방문희망일: "
+                           class="inline-block bg-orange-500 hover:bg-orange-600 text-white font-bold py-3 px-6 rounded-md text-lg mt-6 transition duration-300 transform hover:scale-105 shadow-md">
+                            SMS 방문예약
+                        </a>
+                    </div>
+                    <p class="mt-8 text-sm text-gray-600">
+                        ※ 방문 예약은 원활한 상담을 위한 것으로, 방문 전 반드시 전화로 문의하시어 예약 가능 여부를 확인해 주시기 바랍니다.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <section id="customer-registration-section">
+            <div class="px-4 md:px-12"> <h2 class="text-4xl font-bold text-center text-blue-700 mb-12 md:mt-12">관심고객 등록</h2>
+                <div class="text-center text-lg text-gray-700 leading-relaxed space-y-4">
+                    <p>장안 우미린에 관심 가져주셔서 감사합니다. 관심고객으로 등록하시면 최신 분양 정보, 특별 혜택, 이벤트 소식 등을 가장 먼저 받아보실 수 있습니다.</p>
+                    <p>아래 SMS 등록 버튼을 통해 간편하게 정보를 남겨주세요.</p>
+                    <div class="mt-8 p-6 bg-green-50 rounded-lg shadow-inner inline-block">
+                        <p class="text-xl font-semibold text-gray-900 mb-2">관심고객 SMS 등록</p>
+                        <p class="text-md text-gray-600 mb-4">아래 양식에 맞춰 문자를 보내주시면 등록이 완료됩니다.</p>
+                        <a href="sms:010-5957-1400?body=장안 우미린 관심고객 등록합니다.%0A성함: %0A연락처: %0A"
+                           class="inline-block bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-md text-lg mt-6 transition duration-300 transform hover:scale-105 shadow-md">
+                            SMS 관심고객 등록
+                        </a>
+                    </div>
+                    <p class="mt-8 text-sm text-gray-600">
+                        ※ 등록해주신 정보는 분양 관련 소식 전달 외 다른 목적으로 사용되지 않습니다.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="bg-gray-900 text-gray-300 py-10 px-6 md:px-12 text-center rounded-t-lg">
+        <div class="container mx-auto">
+            <p class="mb-4">© 2025 장안 우미린. All rights reserved.</p>
+            <div class="flex justify-center space-x-6 mb-4">
+                <a href="#" class="hover:text-white transition duration-300">개인정보처리방침</a>
+                <a href="#" class="hover:text-white transition duration-300">이용약관</a>
+                <a href="#" class="hover:text-white transition duration-300">사이트맵</a>
+            </div>
+            <p class="text-sm">부산 기장군 정관읍 매학리 777-9 | 문의 전화: 010-5957-1400</p>
+            <p class="text-sm">VIP 전문 상담사: 정기영 부장</p>
+        </div>
+    </footer>
+
+    <script>
+        // Mobile menu toggle functionality
+        const mobileMenuButton = document.getElementById('mobile-menu-button');
+        const mobileMenu = document.getElementById('mobile-menu');
+        const mobileMenuOverlay = document.getElementById('mobile-menu-overlay');
+        const mobileSubMenus = document.querySelectorAll('#mobile-menu .pl-8');
+        const mainContent = document.getElementById('main-content');
+
+        // Function to close the mobile menu
+        function closeMobileMenu() {
+            mobileMenu.classList.remove('open-menu');
+            mobileMenuButton.classList.remove('open');
+            mobileMenuOverlay.classList.remove('open-overlay');
+            mobileSubMenus.forEach(submenu => {
+                submenu.classList.add('hidden');
+            });
+            console.log('Mobile menu closed.');
+        }
+
+        mobileMenuButton.addEventListener('click', (event) => {
+            console.log('Mobile menu button clicked!');
+            mobileMenu.classList.toggle('open-menu');
+            mobileMenuButton.classList.toggle('open');
+            mobileMenuOverlay.classList.toggle('open-overlay');
+            event.stopPropagation(); // Prevent this click from bubbling to document
+        });
+
+        // Removed: Close mobile menu when clicking outside the menu or the button
+        // document.addEventListener('click', (event) => {
+        //     if (mobileMenu.classList.contains('open-menu')) {
+        //         if (!mobileMenu.contains(event.target) && event.target !== mobileMenuButton && !mobileMenuButton.contains(event.target)) {
+        //             console.log('Click detected outside mobile menu and button, closing menu.');
+        //             closeMobileMenu();
+        //         }
+        //     }
+        // });
+
+        // Removed: Swipe to close functionality for mobile menu
+        // let startY = 0;
+        // let endY = 0;
+        // let isSwiping = false;
+        // const swipeThreshold = 50; // Minimum vertical distance for a swipe
+
+        // mobileMenu.addEventListener('touchstart', (e) => {
+        //     startY = e.touches[0].clientY;
+        //     isSwiping = true;
+        //     e.stopPropagation(); // Prevent background scrolling while swiping menu
+        // }, { passive: false });
+
+        // mobileMenu.addEventListener('touchmove', (e) => {
+        //     if (!isSwiping) return;
+        //     endY = e.touches[0].clientY;
+        //     e.preventDefault(); // Prevent default touch scroll behavior
+        // }, { passive: false });
+
+        // mobileMenu.addEventListener('touchend', () => {
+        //     if (!isSwiping || !mobileMenu.classList.contains('open-menu')) {
+        //         isSwiping = false;
+        //         return;
+        //     }
+
+        //     const diffY = startY - endY; // Positive if swipe up
+
+        //     if (diffY > swipeThreshold) { // If it's a significant swipe up
+        //         console.log('Closing mobile menu due to swipe up.');
+        //         closeMobileMenu();
+        //     }
+        //     isSwiping = false;
+        // });
+
+        // Select all mobile sub-menu toggle buttons
+        const mobileSubMenuButtons = mobileMenu.querySelectorAll('.mobile-submenu-toggle');
+
+        mobileSubMenuButtons.forEach(button => {
+            button.addEventListener('click', (event) => {
+                event.stopPropagation(); // Stop propagation immediately to prevent main menu from closing
+                console.log('Mobile sub-menu toggle button clicked:', event.target.textContent);
+
+                const submenuId = button.dataset.submenuId;
+                const clickedSubmenu = document.getElementById(submenuId);
+
+                mobileSubMenus.forEach(submenu => {
+                    if (submenu !== clickedSubmenu && !submenu.classList.contains('hidden')) {
+                        submenu.classList.add('hidden');
+                    }
+                });
+
+                clickedSubmenu.classList.toggle('hidden');
+            });
+        });
+
+        // Close mobile menu when a link is clicked
+        mobileMenu.querySelectorAll('a').forEach(link => {
+            link.addEventListener('click', (e) => {
+                e.stopPropagation(); // Add this line to stop propagation for links
+                const href = link.getAttribute('href');
+                if (href && href.startsWith('#')) {
+                    e.preventDefault(); // Prevent default anchor link behavior
+                    const targetId = href.substring(1);
+                    console.log('Mobile menu link clicked:', targetId);
+
+                    scrollToSection(targetId);
+                    history.pushState({ section: targetId }, '', location.href.split('#')[0] + `#${targetId}`);
+
+                    closeMobileMenu(); // Close menu immediately after click
+                } else if (href && (href.startsWith('tel:') || href.startsWith('sms:'))) {
+                    // Allow tel: and sms: links to function normally without preventing default
+                    // and then close the menu as they often lead to external apps.
+                    closeMobileMenu();
+                }
+            });
+        });
+
+        // --- 데스크톱 메뉴 하위 메뉴 표시 기능 재구현 (JavaScript) ---
+        const desktopNav = document.getElementById('desktop-nav');
+        const desktopMenuItems = desktopNav.querySelectorAll('.relative');
+
+        desktopMenuItems.forEach(item => {
+            const dropdownMenu = item.querySelector('.dropdown-menu');
+            let hideDropdownTimeout;
+
+            if (dropdownMenu) {
+                item.addEventListener('mouseenter', () => {
+                    clearTimeout(hideDropdownTimeout);
+                    dropdownMenu.style.display = 'block';
+                });
+
+                item.addEventListener('mouseleave', (e) => {
+                    if (e.relatedTarget && (dropdownMenu === e.relatedTarget || dropdownMenu.contains(e.relatedTarget))) {
+                        return;
+                    }
+                    hideDropdownTimeout = setTimeout(() => {
+                        dropdownMenu.style.display = 'none';
+                    }, 500);
+                });
+
+                dropdownMenu.addEventListener('mouseenter', () => {
+                    clearTimeout(hideDropdownTimeout);
+                });
+
+                dropdownMenu.addEventListener('mouseleave', () => {
+                    hideDropdownTimeout = setTimeout(() => {
+                        dropdownMenu.style.display = 'none';
+                    }, 500);
+                });
+            }
+        });
+
+        // --- 스티키 헤더 기능 ---
+        const mainHeader = document.querySelector('header');
+        const heroSection = document.querySelector('section.hero-section');
+
+        let headerHeight = 0;
+
+        function updateMainContentPadding() {
+            headerHeight = mainHeader.offsetHeight;
+            document.documentElement.style.setProperty('--header-height', `${headerHeight}px`);
+
+            if (mainContent && window.innerWidth >= 768) {
+                mainContent.style.paddingTop = `calc(var(--header-height) + 20px)`;
+            } else if (mainContent && window.innerWidth < 768) {
+                mainContent.style.paddingTop = `0px`;
+            }
+        }
+
+        function handleHeaderScroll() {
+            if (window.scrollY > 50) {
+                mainHeader.classList.add('header-solid');
+            } else {
+                mainHeader.classList.remove('header-solid');
+            }
+            updateMainContentPadding();
+        }
+
+        window.addEventListener('load', () => {
+            updateMainContentPadding();
+            handleHeaderScroll();
+
+            if (location.hash) {
+                history.replaceState({ section: location.hash.substring(1) }, '', location.href);
+                setTimeout(() => {
+                    scrollToSection(location.hash.substring(1));
+                }, 100);
+            } else {
+                history.replaceState({ section: '' }, '', location.href.split('#')[0]);
+            }
+        });
+        window.addEventListener('resize', () => {
+            updateMainContentPadding();
+            if (window.innerWidth >= 768) {
+                closeMobileMenu();
+            }
+            handleHeaderScroll();
+        });
+        window.addEventListener('scroll', handleHeaderScroll);
+
+        function scrollToSection(targetId) {
+            const targetElement = document.getElementById(targetId);
+            if (targetElement) {
+                const offset = mainHeader.offsetHeight;
+                const elementPosition = targetElement.getBoundingClientRect().top + window.scrollY;
+                window.scrollTo({
+                    top: elementPosition - offset,
+                    behavior: 'smooth'
+                });
+            } else if (targetId === '') {
+                window.scrollTo({
+                    top: 0,
+                    behavior: 'smooth'
+                });
+            }
+        }
+
+        // Desktop navigation links event listeners
+        desktopNav.querySelectorAll('a').forEach(link => {
+            link.addEventListener('click', (e) => {
+                const href = link.getAttribute('href');
+                if (href && href.startsWith('#')) {
+                    if (link.classList.contains('has-submenu')) {
+                        e.preventDefault();
+                        return;
+                    }
+                    e.preventDefault();
+                    const targetId = href.substring(1);
+                    history.pushState({ section: targetId }, '', location.href.split('#')[0] + `#${targetId}`);
+                    scrollToSection(targetId);
+                }
+            });
+        });
+
+        window.addEventListener('popstate', (event) => {
+            if (event.state && event.state.section !== undefined) {
+                scrollToSection(event.state.section);
+            } else {
+                history.pushState({ section: '' }, '', location.href.split('#')[0]);
+                scrollToSection('');
+            }
+            closeMobileMenu();
+        });
+    </script>
+</body>
+</html>
